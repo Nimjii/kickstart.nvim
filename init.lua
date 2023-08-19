@@ -1,3 +1,6 @@
+-- Dependencies
+require 'utils.autocmds'
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -257,22 +260,7 @@ vim.keymap.set({ 'n' }, 'x', '"_x', { desc = 'Delete character', silent = true }
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
 
--- [[ Delete trailing whitespaces ]]
-vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
-  pattern = { '*' },
-  command = [[%s/\s\+$//e]],
-})
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
