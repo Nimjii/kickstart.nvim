@@ -260,7 +260,18 @@ vim.keymap.set({ 'n' }, 'x', '"_x', { desc = 'Delete character', silent = true }
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- Navigation mappings
+vim.keymap.set('n', ']t', function () vim.cmd.tabnext() end, { desc = 'Next tab' })
+vim.keymap.set('n', '[t', function () vim.cmd.tabprevious() end, { desc = 'Previous tab' })
+vim.keymap.set('n', ']b', function () require('utils.buffer').nav(vim.v.count > 0 and vim.v.count or 1) end, { desc = 'Previous buffer' })
+vim.keymap.set('n', '[b', function () require('utils.buffer').nav(-(vim.v.count > 0 and vim.v.count or 1)) end, { desc = 'Previous buffer' })
+vim.keymap.set('n', ']t', function() vim.cmd.tabnext() end, { desc = "Next tab" })
+vim.keymap.set('n', '[t', function() vim.cmd.tabprevious() end, { desc = "Previous tab" })
 
+-- Buffer mappings
+vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })
+vim.keymap.set('n', '<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
+vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New File' })
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -366,7 +377,7 @@ require('nvim-treesitter.configs').setup {
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+--vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
