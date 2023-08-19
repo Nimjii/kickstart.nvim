@@ -277,6 +277,14 @@ vim.o.termguicolors = true
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-d>', '<C-d>zz', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-u>', '<C-u>zz', { silent = true })
+vim.keymap.set({ 'n' }, 'n', 'nzzzv', { silent = true })
+vim.keymap.set({ 'n' }, 'N', 'Nzzzv', { silent = true })
+vim.keymap.set({ 'n' }, 'd', 'd', { desc = 'Cut', silent = true })
+vim.keymap.set({ 'n' }, 'D', '"_d', { desc = 'Delete', silent = true })
+vim.keymap.set({ 'n' }, 'c', '"_c', { desc = 'Change', silent = true })
+vim.keymap.set({ 'n' }, 'x', '"_x', { desc = 'Delete character', silent = true })
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
