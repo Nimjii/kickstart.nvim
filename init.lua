@@ -97,8 +97,10 @@ require('lazy').setup({
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    dependencies = {
+      'folke/which-key.nvim'
+    },
     opts = {
-      -- See `:help gitsigns.txt`
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -107,9 +109,42 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
       on_attach = function(bufnr)
-        vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { buffer = bufnr, desc = '[G]o to [P]revious Hunk' })
-        vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { buffer = bufnr, desc = '[G]o to [N]ext Hunk' })
-        vim.keymap.set('n', '<leader>ph', require('gitsigns').preview_hunk, { buffer = bufnr, desc = '[P]review [H]unk' })
+        require('which-key').register({
+          h = {
+            name = ' Hunk Actions',
+            v = { require('gitsigns').preview_hunk, 'Pre[v]iew Hunk' },
+            r = { require('gitsigns').reset_hunk, '[R]eset Hunk' },
+            s = { require('gitsigns').stage_hunk, '[S]tage Hunk' },
+            u = { require('gitsigns').undo_stage_hunk, '[U]ndo Stage' },
+            d = { require('gitsigns').diffthis, 'Show [D]iff' },
+          },
+        }, { prefix = '<leader>'})
+
+        vim.keymap.set('n', ']h', function ()
+          if vim.wo.diff then return ']h' end
+          vim.schedule(function ()
+            require('gitsigns').next_hunk()
+
+            vim.schedule(function ()
+              vim.cmd.norm { args = { 'zz' }, bang = true }
+            end)
+          end)
+          return '<Ignore>'
+        end, { buffer = bufnr, desc = 'Go to next hunk' })
+
+        vim.keymap.set('n', '[h', function ()
+          if vim.wo.diff then return '[h' end
+          vim.schedule(function ()
+            require('gitsigns').prev_hunk()
+
+            vim.schedule(function ()
+              vim.cmd.norm { args = { 'zz' }, bang = true }
+            end)
+          end)
+          return '<Ignore>'
+        end, { buffer = bufnr, desc = 'Go to previous hunk' })
+
+        vim.keymap.set({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'inner hunk'})
       end,
     },
   },
