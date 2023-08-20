@@ -169,7 +169,7 @@ require('lazy').setup({
     opts = function (_, opts)
       require('which-key').register({
         G = {
-          name = ' Git blame',
+          name = ' Git blame',
           o = { '<cmd>GitBlameOpenCommitURL<cr>', 'Open commit url' },
           h = { '<cmd>GitBlameCopySHA<cr>', 'Copy commit SHA' },
           u = { '<cmd>GitBlameCopyCommitURL<cr>', 'Copy commit url' },
