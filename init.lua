@@ -311,20 +311,118 @@ require('lazy').setup({
     'nvim-telescope/telescope.nvim',
     branch = '0.1.x',
     dependencies = {
+      'folke/which-key.nvim',
       'nvim-lua/plenary.nvim',
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
         build = 'make',
         cond = function()
           return vim.fn.executable 'make' == 1
         end,
       },
     },
+    opts = function (_, opts)
+      require('which-key').register({
+        f = {
+          name = '󰍉 Find',
+          f = {
+            function ()
+              require('utils').dir_picker(
+                {
+                  show_preview = true,
+                  hidden = false,
+                  no_ignore = false,
+                },
+                require('telescope.builtin').find_files
+              )
+            end,
+            'Find files',
+          },
+          F = {
+            function ()
+              require('utils').dir_picker(
+                {
+                  show_preview = true,
+                  hidden = true,
+                  no_ignore = true,
+                  no_ignore_parent = true,
+                },
+                require('telescope.builtin').find_files
+              )
+            end,
+            'Find all files',
+          },
+          c = { function () require('telescope.builtin').git_commits() end, 'Find commits' },
+          b = { function () require('telescope.builtin').git_branches() end, 'Find branches' },
+          g = { function () require('telescope.builtin').git_files() end, 'Find git files' },
+          w = {
+            function ()
+              require('utils').dir_picker(
+                {
+                  show_preview = true,
+                  hidden = false,
+                  no_ignore = false,
+                },
+                require('telescope.builtin').live_grep
+              )
+            end,
+            'Find words'
+          },
+          W = {
+            function ()
+              require('utils').dir_picker(
+                {
+                  show_preview = true,
+                  hidden = true,
+                  no_ignore = true,
+                  additional_args = function (args)
+                    return vim.list_extend(args, { "--hidden", "--no-ignore" })
+                  end
+                },
+                require('telescope.builtin').live_grep
+              )
+            end,
+            'Find words in all files',
+          },
+          j = { function () require('telescope.builtin').jumplist() end, 'Jumplist' },
+          m = { function () require('telescope.builtin').man_pages() end, 'Find man pages' },
+          s = { function () require('telescope.builtin').grep_string() end, 'Find word under cursor' },
+          o = { function () require('telescope.builtin').oldfiles() end, 'Find recently opened files' },
+          ['<CR>'] = { function () require('telescope.builtin').resume() end, 'Resume last search' },
+        },
+        ['<space>'] = { function () require('telescope.builtin').buffers() end, 'Find existing buffers' },
+        ['/'] = {
+          function ()
+            require('telescope.builtin').current_buffer_fuzzy_find(
+              require('telescope.themes').get_dropdown {
+                winblend = 10,
+                previewer = false,
+              }
+            )
+          end,
+          'Fuzzily search in current buffer',
+        },
+      }, { prefix = '<leader>'})
+
+      opts.pickers = {
+        find_files = {
+          mappings = {
+            n = {
+              ['cd'] = function (prompt_bufnr)
+                local selection = require("telescope.actions.state").get_selected_entry()
+                local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+
+                require("telescope.actions").close(prompt_bufnr)
+
+                vim.cmd(string.format("silent lcd %s", dir))
+              end
+            }
+          }
+        }
+      }
+
+      return opts
+    end,
   },
 
   {
@@ -336,6 +434,9 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 }, {})
+
+-- Enable telescope fzf native, if installed
+pcall(require('telescope').load_extension, 'fzf')
 
 --[[ Setting options ]]
 
@@ -405,33 +506,6 @@ vim.keymap.set('n', '<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
 vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New File' })
 vim.keymap.set('n', '<leader>c', '<cmd>bd<cr>', { desc = 'Close buffer' })
 vim.keymap.set('n', '<leader>C', '<cmd>bd!<cr>', { desc = 'Force close buffer' })
-
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup {
-  defaults = {
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-  },
-}
-
--- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
-
--- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = '[/] Fuzzily search in current buffer' })
 
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
