@@ -403,6 +403,8 @@ vim.keymap.set('n', '[t', function() vim.cmd.tabprevious() end, { desc = "Previo
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })
 vim.keymap.set('n', '<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
 vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New File' })
+vim.keymap.set('n', '<leader>c', '<cmd>bd<cr>', { desc = 'Close buffer' })
+vim.keymap.set('n', '<leader>C', '<cmd>bd!<cr>', { desc = 'Force close buffer' })
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -528,7 +530,7 @@ local on_attach = function(_, bufnr)
   end
 
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  -- nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
