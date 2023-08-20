@@ -1,5 +1,5 @@
 -- Dependencies
-require 'utils.autocmds'
+require 'autocmds'
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
