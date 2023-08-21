@@ -327,27 +327,29 @@ require('lazy').setup({
           name = '󰍉 Find',
           f = {
             function ()
-              require('utils').dir_picker(
+              require('utils.telescope').dir_picker(
                 {
                   show_preview = true,
                   hidden = false,
                   no_ignore = false,
                 },
-                require('telescope.builtin').find_files
+                require('telescope.builtin').find_files,
+                false
               )
             end,
             'Find files',
           },
           F = {
             function ()
-              require('utils').dir_picker(
+              require('utils.telescope').dir_picker(
                 {
                   show_preview = true,
                   hidden = true,
                   no_ignore = true,
                   no_ignore_parent = true,
                 },
-                require('telescope.builtin').find_files
+                require('telescope.builtin').find_files,
+                false
               )
             end,
             'Find all files',
@@ -357,29 +359,32 @@ require('lazy').setup({
           g = { function () require('telescope.builtin').git_files() end, 'Find git files' },
           w = {
             function ()
-              require('utils').dir_picker(
+              require('utils.telescope').dir_picker(
                 {
                   show_preview = true,
                   hidden = false,
                   no_ignore = false,
                 },
-                require('telescope.builtin').live_grep
+                require('telescope.builtin').live_grep,
+                true
               )
             end,
             'Find words'
           },
           W = {
             function ()
-              require('utils').dir_picker(
+              require('utils.telescope').dir_picker(
                 {
                   show_preview = true,
                   hidden = true,
                   no_ignore = true,
+                  no_ignore_parent = true,
                   additional_args = function (args)
                     return vim.list_extend(args, { "--hidden", "--no-ignore" })
                   end
                 },
-                require('telescope.builtin').live_grep
+                require('telescope.builtin').live_grep,
+                true
               )
             end,
             'Find words in all files',
@@ -388,6 +393,7 @@ require('lazy').setup({
           m = { function () require('telescope.builtin').man_pages() end, 'Find man pages' },
           s = { function () require('telescope.builtin').grep_string() end, 'Find word under cursor' },
           o = { function () require('telescope.builtin').oldfiles() end, 'Find recently opened files' },
+          h = { function () require('telescope.builtin').marks() end, 'Find marks' },
           ['<CR>'] = { function () require('telescope.builtin').resume() end, 'Resume last search' },
         },
         ['<space>'] = { function () require('telescope.builtin').buffers() end, 'Find existing buffers' },
@@ -404,21 +410,11 @@ require('lazy').setup({
         },
       }, { prefix = '<leader>'})
 
-      opts.pickers = {
-        find_files = {
-          mappings = {
-            n = {
-              ['cd'] = function (prompt_bufnr)
-                local selection = require("telescope.actions.state").get_selected_entry()
-                local dir = vim.fn.fnamemodify(selection.path, ":p:h")
-
-                require("telescope.actions").close(prompt_bufnr)
-
-                vim.cmd(string.format("silent lcd %s", dir))
-              end
-            }
-          }
-        }
+      opts.defaults = {
+        file_ignore_patterns = {
+          "node_modules/*",
+          ".git/*",
+        },
       }
 
       return opts
@@ -507,11 +503,6 @@ vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New File' })
 vim.keymap.set('n', '<leader>c', '<cmd>bd<cr>', { desc = 'Close buffer' })
 vim.keymap.set('n', '<leader>C', '<cmd>bd!<cr>', { desc = 'Force close buffer' })
 
-vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- [[ Configure Treesitter ]]
