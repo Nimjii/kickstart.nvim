@@ -31,34 +31,17 @@ local function close(prompt_bufnr)
   end
 end
 
-local function getDirFindCommand(opts)
-  if opts.find_command then
-    if type(opts.find_command) == 'function' then
-      return opts.find_command(opts)
-    end
-    return opts.find_command
-  elseif 1 == vim.fn.executable('fd') then
-    return { 'fd', '--type', 'd', '--color', 'never', '--exclude', 'node_modules', '--exclude', '.git'}
-  elseif 1 == vim.fn.executable('fdfind') then
-    return { 'fdfind', '--type', 'd', '--color', 'never', '--exclude', 'node_modules', '--exclude', '.git'}
-  end
+local function getDirFindCommand()
+  return { 'fd', '--type', 'd', '--color', 'never', '--exclude', 'node_modules', '--exclude', '.git'}
 end
 
-local function getExtFindCommand(opts)
-  if opts.find_command then
-    if type(opts.find_command) == 'function' then
-      return opts.find_command(opts)
-    end
-    return opts.find_command
-  elseif 1 == vim.fn.executable('fd') then
-    return 'fd --type f --color never --exclude node_modules --exclude .git'
-  elseif 1 == vim.fn.executable('fdfind') then
-    return 'fdfind --type f --color never --exclude node_modules --exclude .git'
-  end
+local function getExtFindCommand()
+  return "rg --files --color never -g '!node_modules' -g '!.git'"
 end
 
 function M.ext_picker(opts, fn)
-  local find_command = getExtFindCommand(opts)
+  local find_command = getExtFindCommand()
+  local search_dirs = opts.search_dirs
 
   if opts.hidden then
     find_command = find_command .. ' --hidden'
@@ -70,6 +53,16 @@ function M.ext_picker(opts, fn)
 
   if opts.no_ignore_parent then
     find_command = find_command .. ' --no-ignore-parent'
+  end
+
+  if search_dirs then
+    for k, v in pairs(opts.search_dirs) do
+      search_dirs[k] = vim.fn.expand(v)
+    end
+
+    for _, dir in pairs(search_dirs) do
+      find_command = find_command .. ' ' .. dir
+    end
   end
 
   local additional_options = { '|', 'gawk', "'match($0, /(\\.)([^\\.\\/]*)$/, arr) {print arr[2]}'", '|', 'sort', '|', 'uniq' }
@@ -118,7 +111,7 @@ function M.ext_picker(opts, fn)
                 end
               end
 
-              actions.close(prompt_bufnr)
+              close(prompt_bufnr)
 
               if type(opts.additional_args) == 'function' then
                 opts.additional_args = opts.additional_args(additional_args)
@@ -141,7 +134,7 @@ function M.ext_picker(opts, fn)
 end
 
 function M.dir_picker(opts, fn, live_grep)
-  local find_command = getDirFindCommand(opts)
+  local find_command = getDirFindCommand()
   local command = find_command[1]
   local hidden = opts.hidden
   local no_ignore = opts.no_ignore
@@ -198,7 +191,7 @@ function M.dir_picker(opts, fn, live_grep)
                 end
               end
 
-              actions.close(prompt_bufnr)
+              close(prompt_bufnr)
 
               opts.search_dirs = dirs
 
