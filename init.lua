@@ -31,6 +31,8 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   { import = 'plugins' },
 
+  'echasnovski/mini.bufremove',
+
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
@@ -183,8 +185,8 @@ vim.keymap.set('n', '[t', function() vim.cmd.tabprevious() end, { desc = "Previo
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })
 vim.keymap.set('n', '<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
 vim.keymap.set('n', '<leader>n', '<cmd>enew<cr>', { desc = 'New File' })
-vim.keymap.set('n', '<leader>c', '<cmd>bd<cr>', { desc = 'Close buffer' })
-vim.keymap.set('n', '<leader>C', '<cmd>bd!<cr>', { desc = 'Force close buffer' })
+vim.keymap.set('n', '<leader>c', function () require('utils.buffer').close() end, { desc = 'Close buffer' })
+vim.keymap.set('n', '<leader>C', function () require('utils.buffer').close(0, true) end, { desc = 'Force close buffer' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
