@@ -19,10 +19,38 @@ return {
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-cmdline',
     'ray-x/cmp-treesitter',
+    'js-everts/cmp-tailwind-colors',
   },
   config = function ()
     local cmp = require('cmp')
     local ls = require('luasnip')
+    local icons = {
+      Text = "",
+      Method = "",
+      Function = "󰊕",
+      Constructor = "",
+      Field = "󰷳",
+      Variable = "󰫧",
+      Class = "",
+      Interface = "",
+      Module = "",
+      Property = "",
+      Unit = "",
+      Value = "",
+      Enum = "",
+      Keyword = "",
+      Snippet = "",
+      Color = "",
+      File = "󰈙",
+      Reference = "",
+      Folder = "",
+      EnumMember = "",
+      Constant = "",
+      Struct = "",
+      Event = "",
+      Operator = "",
+      TypeParameter = "",
+    }
 
     require('luasnip.loaders.from_vscode').lazy_load()
     require('luasnip.loaders.from_lua').lazy_load({paths = '~/.config/nvim/lua/snippets'})
@@ -31,6 +59,29 @@ return {
     ls.config.setup {}
 
     cmp.setup({
+      formatting = {
+        fields = { 'kind', 'abbr', 'menu' },
+        format = function(entry, item)
+          if item.kind == 'Color' then
+            item = require('cmp-tailwind-colors').format(entry, item)
+
+            if item.kind ~= 'Color' then
+              item.menu = 'Color'
+              return item
+            end
+          end
+
+          item.menu = item.kind
+
+          if icons[item.kind] then
+            item.kind = icons[item.kind] .. ' '
+          else
+            item.kind = ''
+          end
+
+          return item
+        end,
+      },
       snippet = {
         expand = function(args)
           ls.lsp_expand(args.body)
