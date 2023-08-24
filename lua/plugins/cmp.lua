@@ -13,6 +13,12 @@ return {
 
     -- Adds a number of user-friendly snippets
     'rafamadriz/friendly-snippets',
+
+    'hrsh7th/cmp-nvim-lsp-signature-help',
+    'hrsh7th/cmp-path',
+    'hrsh7th/cmp-buffer',
+    'hrsh7th/cmp-cmdline',
+    'ray-x/cmp-treesitter',
   },
   config = function ()
     local cmp = require('cmp')
@@ -59,15 +65,38 @@ return {
           end
         end, { 'i', 's' }),
       },
+      sources = {
+        { name = 'buffer'},
+        { name = 'nvim_lsp' },
+        { name = 'luasnip' },
+        { name = 'nvim_lsp_signature_help' },
+        { name = 'treesitter'},
+        {
+          name = 'path',
+          option = {
+            trailing_slash = true,
+          },
+        },
+      },
+    })
+
+    cmp.setup.cmdline('/', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = 'buffer'},
+      },
+    })
+
+    cmp.setup.cmdline(':', {
+      mapping = cmp.mapping.preset.cmdline(),
       sources = cmp.config.sources(
         {
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
+          { name = 'path' },
         },
         {
-          { name = 'buffer'},
+          { name = 'cmdline' },
         }
-      ),
+      )
     })
   end
 }
