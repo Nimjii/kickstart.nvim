@@ -1,13 +1,5 @@
 -- cmp.lua
 
-local function copy(args)
-  return args[1][1]
-end
-
-local function copyUpper(args)
-  return args[1][1]:gsub('^%l', string.upper)
-end
-
 return {
   -- Autocompletion
   'hrsh7th/nvim-cmp',
@@ -27,38 +19,10 @@ return {
     local ls = require('luasnip')
 
     require('luasnip.loaders.from_vscode').lazy_load()
+    require('luasnip.loaders.from_lua').lazy_load({paths = '~/.config/nvim/lua/snippets'})
     require('luasnip.loaders.from_snipmate').load({paths = '~/.config/nvim/snippets'})
 
     ls.config.setup {}
-
-    ls.add_snippets('php', {
-      ls.snippet('gs', {
-        ls.text_node({'/**', ' * @return '}),
-        ls.function_node(copy, 2),
-        ls.text_node({'',' */', 'public function get'}),
-        ls.function_node(copyUpper, 1),
-        ls.text_node('(): '),
-        ls.insert_node(2, 'string'),
-        ls.text_node({'', '{', '    return $this->'}),
-        ls.insert_node(1, 'foo'),
-        ls.text_node({';', '}', '', '/**', ' * @param '}),
-        ls.function_node(copy, 2),
-        ls.text_node(' $'),
-        ls.function_node(copy, 1),
-        ls.text_node({'', ' * @return self', ' */', 'public function set'}),
-        ls.function_node(copyUpper, 1),
-        ls.text_node('('),
-        ls.function_node(copy, 2),
-        ls.text_node(' $'),
-        ls.function_node(copy, 1),
-        ls.text_node({'): self', '{', '    $this->'}),
-        ls.function_node(copy, 1),
-        ls.text_node(' = $'),
-        ls.function_node(copy, 1),
-        ls.text_node({';', '    return $this;', '}'}),
-        ls.insert_node(0),
-      })
-    })
 
     cmp.setup({
       snippet = {
