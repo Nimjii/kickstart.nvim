@@ -175,6 +175,10 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>m', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 
+-- Snippet keymaps
+vim.keymap.set('n', '<Tab>', function () require('luasnip').jump(1) end, { silent = true })
+vim.keymap.set('n', '<S-Tab>', function () require('luasnip').jump(-1) end, { silent = true })
+
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
