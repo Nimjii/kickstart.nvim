@@ -1,40 +1,69 @@
 -- cmp.lua
 
+local function copy(args)
+  return args[1][1]
+end
+
+local function copyUpper(args)
+  return args[1][1]:gsub('^%l', string.upper)
+end
+
 return {
   -- Autocompletion
   'hrsh7th/nvim-cmp',
   dependencies = {
     -- Snippet Engine & its associated nvim-cmp source
-    {
-      'saadparwaiz1/cmp_luasnip',
-      dependencies = {
-        {
-          'L3MON4D3/LuaSnip',
-          dependencies = {
-            -- Adds a number of user-friendly snippets
-            'rafamadriz/friendly-snippets',
-          }
-        }
-      },
-    },
+    'L3MON4D3/LuaSnip',
+    'saadparwaiz1/cmp_luasnip',
 
     -- Adds LSP completion capabilities
     'hrsh7th/cmp-nvim-lsp',
+
+    -- Adds a number of user-friendly snippets
+    'rafamadriz/friendly-snippets',
   },
   config = function ()
     local cmp = require('cmp')
-    local luasnip = require('luasnip')
+    local ls = require('luasnip')
 
     require('luasnip.loaders.from_vscode').lazy_load()
     require('luasnip.loaders.from_snipmate').load({paths = '~/.config/nvim/snippets'})
 
-    luasnip.config.setup {}
+    ls.config.setup {}
+
+    ls.add_snippets('php', {
+      ls.snippet('gs', {
+        ls.text_node({'/**', ' * @return '}),
+        ls.function_node(copy, 2),
+        ls.text_node({'',' */', 'public function get'}),
+        ls.function_node(copyUpper, 1),
+        ls.text_node('(): '),
+        ls.insert_node(2, 'string'),
+        ls.text_node({'', '{', '    return $this->'}),
+        ls.insert_node(1, 'foo'),
+        ls.text_node({';', '}', '', '/**', ' * @param '}),
+        ls.function_node(copy, 2),
+        ls.text_node(' $'),
+        ls.function_node(copy, 1),
+        ls.text_node({'', ' * @return self', ' */', 'public function set'}),
+        ls.function_node(copyUpper, 1),
+        ls.text_node('('),
+        ls.function_node(copy, 2),
+        ls.text_node(' $'),
+        ls.function_node(copy, 1),
+        ls.text_node({'): self', '{', '    $this->'}),
+        ls.function_node(copy, 1),
+        ls.text_node(' = $'),
+        ls.function_node(copy, 1),
+        ls.text_node({';', '    return $this;', '}'}),
+        ls.insert_node(0),
+      })
+    })
 
     cmp.setup({
       snippet = {
         expand = function(args)
-          luasnip.lsp_expand(args.body)
-          snippy.expand_snippet(args.body)
+          ls.lsp_expand(args.body)
         end,
       },
       mapping = cmp.mapping.preset.insert {

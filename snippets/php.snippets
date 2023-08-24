@@ -398,30 +398,6 @@ snippet ve "Dumb debug helper in HTML"
 	echo '<pre>' . var_export(${1}, 1) . '</pre>';
 snippet pc "Dumb debug helper in cli"
 	var_export($1);$0
-# Getters & Setters
-snippet gs "PHP Class Getter Setter"
-	/**
-	 * Gets the value of ${1:foo}
-	 *
-	 * @return ${2:string}
-	 */
-	public function get${3:$1}()
-	{
-		return $this->${4:$1};
-	}
-
-	/**
-	 * Sets the value of $1
-	 *
-	 * @param $2 $$1 ${5:description}
-	 *
-	 * @return ${6:`vim_snippets#Filename()`}
-	 */
-	public function set$3(${7:$2 }$$1)
-	{
-		$this->$4 = $$1;
-		return $this;
-	}
 # anotation, get, and set, useful for doctrine
 snippet ags
 	/**
