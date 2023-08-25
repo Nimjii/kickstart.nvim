@@ -71,6 +71,16 @@ return {
     ls.config.setup {}
 
     cmp.setup({
+      window = {
+        completion = cmp.config.window.bordered({
+          border = 'single',
+          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
+        }),
+        documentation = cmp.config.window.bordered({
+          border = 'single',
+          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
+        }),
+      },
       formatting = {
         fields = { 'kind', 'abbr', 'menu' },
         format = function(entry, item)
@@ -99,6 +109,11 @@ return {
           ls.lsp_expand(args.body)
         end,
       },
+      preselect = cmp.PreselectMode.None,
+      confirm_opts = {
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = false,
+      },
       mapping = cmp.mapping.preset.insert {
         ['<C-n>'] = cmp.mapping.select_next_item(),
         ['<C-p>'] = cmp.mapping.select_prev_item(),
@@ -112,8 +127,8 @@ return {
         ['<Tab>'] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_next_item()
-          elseif luasnip.expand_or_locally_jumpable() then
-            luasnip.expand_or_jump()
+          elseif ls.expand_or_locally_jumpable() then
+            ls.expand_or_jump()
           else
             fallback()
           end
@@ -121,25 +136,26 @@ return {
         ['<S-Tab>'] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-          elseif luasnip.locally_jumpable(-1) then
-            luasnip.jump(-1)
+          elseif ls.locally_jumpable(-1) then
+            ls.jump(-1)
           else
             fallback()
           end
         end, { 'i', 's' }),
       },
       sources = {
-        { name = 'buffer'},
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-        { name = 'nvim_lsp_signature_help' },
-        { name = 'treesitter'},
+        { name = 'nvim_lsp', priority = 1000 },
+        { name = 'luasnip', priority = 900 },
+        { name = 'nvim_lsp_signature_help', priority = 800 },
+        { name = 'buffer', priority = 700 },
         {
           name = 'path',
+          priority = 600,
           option = {
             trailing_slash = true,
           },
         },
+        { name = 'treesitter', priority = 500 },
       },
     })
 
