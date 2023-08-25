@@ -19,7 +19,19 @@ return {
     'hrsh7th/cmp-buffer',
     'hrsh7th/cmp-cmdline',
     'ray-x/cmp-treesitter',
-    'js-everts/cmp-tailwind-colors',
+    {
+      'js-everts/cmp-tailwind-colors',
+      opts = {
+        enable_alpha = true,
+        format = function(itemColor)
+          return {
+            fg = itemColor,
+            bg = nil,
+            text = '󰌁',
+          }
+        end,
+      },
+    },
   },
   config = function ()
     local cmp = require('cmp')
