@@ -108,7 +108,6 @@ return {
       prompt_prefix = string.format('%s ', ''),
       selection_caret = string.format('%s ', '❯'),
       path_display = { 'truncate' },
-      cache_picker = false,
       file_ignore_patterns = {
         "node_modules/",
         ".git/",
