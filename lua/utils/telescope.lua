@@ -39,6 +39,21 @@ local function getExtFindCommand()
   return "rg --files --color never -g '!node_modules' -g '!.git'"
 end
 
+function M.buffers()
+  require('telescope.builtin').buffers({
+    ignore_current_buffer = true,
+    attach_mappings = function (_, map)
+      map({'n', 'i'}, '<C-x>', function ()
+        local selection = action_state.get_selected_entry()
+
+        vim.api.nvim_buf_delete(selection.bufnr, { force = true })
+      end)
+
+      return true
+    end
+  })
+end
+
 function M.ext_picker(opts, fn)
   local find_command = getExtFindCommand()
   local search_dirs = opts.search_dirs

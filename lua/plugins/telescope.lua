@@ -90,7 +90,7 @@ return {
         h = { function () require('telescope.builtin').marks() end, 'Find marks' },
         ['<CR>'] = { function () require('telescope.builtin').resume() end, 'Resume last search' },
       },
-      ['<space>'] = { function () require('telescope.builtin').buffers() end, 'Find existing buffers' },
+      ['<space>'] = { function () require('utils.telescope').buffers() end, 'Find existing buffers' },
       ['/'] = {
         function ()
           require('telescope.builtin').current_buffer_fuzzy_find(
