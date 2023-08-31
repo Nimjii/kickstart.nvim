@@ -176,10 +176,6 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- Navigation mappings
 vim.keymap.set('n', ']t', function () vim.cmd.tabnext() end, { desc = 'Next tab' })
 vim.keymap.set('n', '[t', function () vim.cmd.tabprevious() end, { desc = 'Previous tab' })
-vim.keymap.set('n', ']b', function () require('utils.buffer').nav(vim.v.count > 0 and vim.v.count or 1) end, { desc = 'Previous buffer' })
-vim.keymap.set('n', '[b', function () require('utils.buffer').nav(-(vim.v.count > 0 and vim.v.count or 1)) end, { desc = 'Previous buffer' })
-vim.keymap.set('n', ']t', function() vim.cmd.tabnext() end, { desc = "Next tab" })
-vim.keymap.set('n', '[t', function() vim.cmd.tabprevious() end, { desc = "Previous tab" })
 
 -- Buffer mappings
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })

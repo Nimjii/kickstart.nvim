@@ -1,5 +1,22 @@
 -- lualine.lua
 
+local function get_lsps()
+  local output = ''
+  local clients = vim.lsp.get_active_clients({
+    bufnr = vim.api.nvim_get_current_buf(),
+  })
+
+  for i, client in pairs(clients) do
+    if i == 1 then
+      output = output .. client.name
+    else
+      output = output .. ', ' .. client.name
+    end
+  end
+
+  return output
+end
+
 return {
   -- Set lualine as statusline
   'nvim-lualine/lualine.nvim',
@@ -39,21 +56,7 @@ return {
 
     opts.tabline = {
       lualine_a = {'branch'},
-      lualine_b = {
-        {
-          'buffers',
-          show_filename_only = true,
-          hide_filename_extension = false,
-          show_modified_status = true,
-          mode = 0,
-          use_mode_colors = true,
-          symbols = {
-            modified = ' 󰏪',
-            alternate_file = '',
-            directory = '',
-          },
-        },
-      },
+      lualine_b = { get_lsps },
       lualine_c = {},
       lualine_x = {},
       lualine_y = {},
