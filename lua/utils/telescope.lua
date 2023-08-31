@@ -108,7 +108,7 @@ function M.ext_picker(opts, fn)
 
               if vim.tbl_isempty(selections) then
                 if action_state.get_selected_entry().value == 'scss' then
-                  additional_args[#additional_args + 1] = '--type=css'
+                  additional_args[#additional_args + 1] = '--type=sass'
                 elseif action_state.get_selected_entry().value == 'yml' then
                   additional_args[#additional_args + 1] = '--type=yaml'
                 elseif action_state.get_selected_entry().value ~= '' then
