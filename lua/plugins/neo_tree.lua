@@ -142,6 +142,9 @@ return {
           visible = true,
           hide_dotfiles = false,
           hide_gitignored = false,
+          never_show = {
+            '.DS_Store',
+          },
         },
         follow_current_file = { enabled = true },
         hijack_netrw_behavior = "open_current",
