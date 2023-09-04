@@ -230,9 +230,21 @@ end
 local servers = {
   html = {},
   phpactor = {},
-  intelephense = {},
-  tailwindcss = {},
   tsserver = {},
+
+  tailwindcss = {
+    filetypes = {
+      'html',
+      'css',
+      'javascript',
+      'javascriptreact',
+    },
+  },
+
+  intelephense = {
+    ['intelephense.files.maxSize'] = 1000000,
+    ['intelephense.maxMemory'] = 2048,
+  },
 
   lua_ls = {
     Lua = {
@@ -263,9 +275,13 @@ mason_lspconfig.setup_handlers {
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
+      root_dir = require('lspconfig.util').root_pattern('.git'),
     }
   end
 }
+
+
+vim.lsp.set_log_level('off');
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
