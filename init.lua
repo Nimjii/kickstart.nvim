@@ -220,7 +220,7 @@ local on_attach = function(_, bufnr)
 
   nmap('gd', vim.lsp.buf.definition, 'Goto Definition')
   nmap('gD', vim.lsp.buf.declaration, 'Goto Declaration')
-  nmap('gr', require('telescope.builtin').lsp_references, 'Goto References')
+  nmap('gr', vim.lsp.buf.references, 'Goto References')
   nmap('gI', vim.lsp.buf.implementation, 'Goto Implementation')
   nmap('gt', vim.lsp.buf.type_definition, 'Type Definition')
   nmap('<leader>fS', require('telescope.builtin').lsp_document_symbols, 'Document Symbols')

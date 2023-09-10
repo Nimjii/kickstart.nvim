@@ -105,6 +105,18 @@ return {
       },
     }, { prefix = '<leader>'})
 
+    local handlers = {
+      ['textDocument/declaration'] = require('utils.telescope').location_handler('LSP Declarations'),
+      ['textDocument/definition'] = require('utils.telescope').location_handler('LSP Definitions'),
+      ['textDocument/implementation'] = require('utils.telescope').location_handler('LSP Implementations'),
+      ['textDocument/typeDefinition'] = require('utils.telescope').location_handler('LSP Type Definitions'),
+      ['textDocument/references'] = require('utils.telescope').location_handler('LSP References'),
+    }
+
+    for req, handler in pairs(handlers) do
+      vim.lsp.handlers[req] = handler
+    end
+
     opts.defaults = {
       prompt_prefix = string.format('%s ', ''),
       selection_caret = string.format('%s ', '❯'),

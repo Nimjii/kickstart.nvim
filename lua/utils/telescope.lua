@@ -9,6 +9,111 @@ local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local make_entry = require("telescope.make_entry")
 
+local jump_to_location = vim.lsp.util.jump_to_location
+
+local mapping_actions = {
+  ['<C-x>'] = actions.file_split,
+  ['<C-v>'] = actions.file_vsplit,
+  ['<C-t>'] = actions.file_tab,
+}
+
+local function get_correct_result(result1, result2)
+  return type(result1) == 'table' and result1 or result2
+end
+
+local function jump_fn(prompt_bufnr, action, offset_encoding)
+  return function ()
+    local selection = action_state.get_selected_entry()
+
+    if not selection then
+      return
+    end
+
+    if action then
+      action(prompt_bufnr)
+    else
+      actions.close(prompt_bufnr)
+    end
+
+    local pos = {
+      line = selection.lnum - 1,
+      character = selection.col,
+    }
+
+    jump_to_location({
+      uri = vim.uri_from_fname(selection.filename),
+      range = {
+        start = pos,
+        ['end'] = pos,
+      },
+    }, offset_encoding)
+  end
+end
+
+local function attach_location_mappings(offset_encoding)
+  return function (prompt_bufnr, map)
+    local modes = { 'i', 'n' }
+    local keys = { '<CR>', '<C-x>', '<C-v', '<C-t>' }
+
+    for _, mode in pairs(modes) do
+      for _, key in pairs(keys) do
+        local action = mapping_actions[key]
+        map(mode, key, jump_fn(prompt_bufnr, action, offset_encoding))
+      end
+    end
+
+    return true
+  end
+end
+
+local function find(prompt_title, items, find_opts, offset_encoding)
+  local opts = find_opts.opts or {}
+
+  local entry_maker = find_opts.entry_maker or make_entry.gen_from_quickfix(opts)
+  local attach_mappings = find_opts.attach_mappings or attach_location_mappings(offset_encoding)
+  local previewer = nil
+
+  if not find_opts.hide_preview then
+    previewer = conf.qflist_previewer(opts)
+  end
+
+  pickers.new(opts, {
+    prompt_title = prompt_title,
+    finder = finders.new_table({
+      results = items,
+      entry_maker = entry_maker,
+    }),
+    previewer = previewer,
+    sorter = conf.generic_sorter(opts),
+    attach_mappings = attach_mappings,
+  }):find()
+end
+
+function M.location_handler(prompt_title)
+  return function (_, result, context, _)
+    local res = get_correct_result(result, context)
+    local client = vim.lsp.get_client_by_id(context.client_id)
+
+    if not res or vim.tbl_isempty(res) then
+      print('No references found')
+      return
+    end
+
+    if not vim.tbl_islist(res) then
+      jump_to_location(res, client.offset_encoding)
+      return
+    end
+
+    if #res == 1 then
+      jump_to_location(res[1], client.offset_encoding)
+      return
+    end
+
+    local items = vim.lsp.util.locations_to_items(res, client.offset_encoding)
+    find(prompt_title, items, { opts = {} }, client.offset_encoding)
+  end
+end
+
 local function getPreviewer(opts)
   if opts.show_preview then
     return conf.file_previewer(opts)
