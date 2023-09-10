@@ -147,11 +147,9 @@ end
 function M.buffers()
   require('telescope.builtin').buffers({
     ignore_current_buffer = true,
-    attach_mappings = function (_, map)
-      map({'n', 'i'}, '<C-x>', function ()
-        local selection = action_state.get_selected_entry()
-
-        vim.api.nvim_buf_delete(selection.bufnr, { force = true })
+    attach_mappings = function (prompt_bufnr, map)
+      map({'n', 'i'}, '<C-b>', function ()
+        actions.delete_buffer(prompt_bufnr)
       end)
 
       return true
