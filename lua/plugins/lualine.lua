@@ -17,6 +17,11 @@ local function get_lsps()
   return output
 end
 
+local function get_grapple()
+  local key = require("grapple").key()
+  return "󰛢 [" .. key .. "]"
+end
+
 return {
   -- Set lualine as statusline
   'nvim-lualine/lualine.nvim',
@@ -59,7 +64,9 @@ return {
       lualine_b = { get_lsps },
       lualine_c = {},
       lualine_x = {},
-      lualine_y = {},
+      lualine_y = {
+        { get_grapple, cond = require('grapple').exists },
+      },
       lualine_z = {
         {
           'tabs',
