@@ -4,6 +4,7 @@ return {
   'nvim-telescope/telescope.nvim',
   branch = '0.1.x',
   dependencies = {
+    'folke/noice.nvim',
     'folke/which-key.nvim',
     'nvim-lua/plenary.nvim',
     {
@@ -15,6 +16,8 @@ return {
     },
   },
   opts = function (_, opts)
+    require('telescope').load_extension('noice')
+
     require('which-key').register({
       f = {
         name = '󰍉 Find',
@@ -85,6 +88,7 @@ return {
           'Find words in all files',
         },
         j = { function () require('telescope.builtin').jumplist() end, 'Jumplist' },
+        n = { function () require('noice').cmd('telescope') end, 'Message history' },
         m = { function () require('telescope.builtin').man_pages() end, 'Find man pages' },
         s = { function () require('telescope.builtin').grep_string() end, 'Find word under cursor' },
         o = { function () require('telescope.builtin').oldfiles() end, 'Find recently opened files' },
@@ -118,7 +122,7 @@ return {
     end
 
     opts.defaults = {
-      prompt_prefix = string.format('%s ', ''),
+      prompt_prefix = string.format('%s ', ' '),
       selection_caret = string.format('%s ', '❯'),
       path_display = { 'truncate' },
       file_ignore_patterns = {
