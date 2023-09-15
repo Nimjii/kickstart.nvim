@@ -226,6 +226,7 @@ local on_attach = function(_, bufnr)
 end
 
 local servers = {
+  cssls = {},
   html = {},
   phpactor = {},
   tsserver = {},
