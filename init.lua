@@ -148,6 +148,8 @@ vim.g.gitblame_message_template = "<summary> • <date> • <author>"
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-f>', '<C-f>zz', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-b>', '<C-b>zz', { silent = true })
 vim.keymap.set({ 'n', 'v' }, '<C-d>', '<C-d>zz', { silent = true })
 vim.keymap.set({ 'n', 'v' }, '<C-u>', '<C-u>zz', { silent = true })
 vim.keymap.set({ 'n' }, 'n', 'nzzzv', { silent = true })
