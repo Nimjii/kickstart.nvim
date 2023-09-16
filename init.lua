@@ -128,6 +128,7 @@ vim.o.foldenable = true
 vim.o.hlsearch= false
 vim.o.ignorecase= true
 vim.o.mouse= 'a'
+vim.o.pumblend = 5
 vim.o.scrolloff= 8
 vim.o.smartcase= true
 vim.o.termguicolors= true

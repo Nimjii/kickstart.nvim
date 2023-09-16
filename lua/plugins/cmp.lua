@@ -36,6 +36,7 @@ return {
   config = function ()
     local cmp = require('cmp')
     local ls = require('luasnip')
+
     local icons = {
       Text = "",
       Method = "",
@@ -64,6 +65,11 @@ return {
       TypeParameter = "",
     }
 
+    local border_opts = {
+      border = 'single',
+      winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
+    }
+
     require('luasnip.loaders.from_vscode').lazy_load()
     require('luasnip.loaders.from_lua').lazy_load({paths = '~/.config/nvim/lua/snippets'})
     require('luasnip.loaders.from_snipmate').load({paths = '~/.config/nvim/snippets'})
@@ -72,14 +78,8 @@ return {
 
     cmp.setup({
       window = {
-        completion = cmp.config.window.bordered({
-          border = 'single',
-          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
-        }),
-        documentation = cmp.config.window.bordered({
-          border = 'single',
-          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
-        }),
+        completion = cmp.config.window.bordered(border_opts),
+        documentation = cmp.config.window.bordered(border_opts),
       },
       formatting = {
         fields = { 'kind', 'abbr', 'menu' },
@@ -120,9 +120,16 @@ return {
         ['<C-d>'] = cmp.mapping.scroll_docs(-4),
         ['<C-f>'] = cmp.mapping.scroll_docs(4),
         ['<C-Space>'] = cmp.mapping.complete {},
-        ['<CR>'] = cmp.mapping.confirm {
-          behavior = cmp.ConfirmBehavior.Replace,
-          select = true,
+        ['<CR>'] = cmp.mapping {
+          i = function(fallback)
+           if cmp.visible() and cmp.get_active_entry() then
+             cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+           else
+             fallback()
+           end
+          end,
+          s = cmp.mapping.confirm({ select = true }),
+          c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
         },
         ['<Tab>'] = cmp.mapping(function(fallback)
           if cmp.visible() then
@@ -143,7 +150,7 @@ return {
           end
         end, { 'i', 's' }),
       },
-      sources = {
+      sources = cmp.config.sources {
         { name = 'nvim_lsp', priority = 1000 },
         { name = 'luasnip', priority = 900 },
         { name = 'nvim_lsp_signature_help', priority = 800 },
