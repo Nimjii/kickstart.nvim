@@ -51,8 +51,7 @@ return {
           'Find all files',
         },
         c = { function () require('telescope.builtin').git_commits() end, 'Find commits' },
-        B = { function () require('telescope.builtin').git_branches() end, 'Find branches' },
-        b = { function () require('utils.telescope').buffers() end, 'Find existing buffers' },
+        b = { function () require('telescope.builtin').git_branches() end, 'Find branches' },
         d = { function () require('telescope.builtin').diagnostics() end, 'Find diagnostics' },
         g = { function () require('telescope.builtin').git_files() end, 'Find git files' },
         w = {
@@ -95,7 +94,7 @@ return {
         h = { function () require('telescope.builtin').marks() end, 'Find marks' },
         ['<CR>'] = { function () require('telescope.builtin').resume() end, 'Resume last search' },
       },
-      ['<space>'] = { function () require('telescope.builtin').marks() end, 'Find marks' },
+      ['<space>'] = { function () require('utils.telescope').buffers() end, 'Find existing buffers' },
       ['/'] = {
         function ()
           require('telescope.builtin').current_buffer_fuzzy_find(
