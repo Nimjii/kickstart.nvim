@@ -1,6 +1,7 @@
 -- @module utils.telescope
 
 local M = {}
+
 local action_set = require("telescope.actions.set")
 local action_state = require("telescope.actions.state")
 local actions = require("telescope.actions")
@@ -114,7 +115,7 @@ function M.location_handler(prompt_title)
   end
 end
 
-local function getPreviewer(opts)
+local function get_previewer(opts)
   if opts.show_preview then
     return conf.file_previewer(opts)
   else
@@ -136,43 +137,34 @@ local function close(prompt_bufnr)
   end
 end
 
-local function getDirFindCommand()
-  return { 'fd', '--type', 'd', '--color', 'never', '--exclude', 'node_modules', '--exclude', '.git'}
-end
+local function get_dir_find_command(opts)
+  local find_command = { 'fd', '--type', 'd', '--color', 'never', '--exclude', 'node_modules', '--exclude', '.git'}
+  local command = find_command[1]
+  local hidden = opts.hidden
+  local no_ignore = opts.no_ignore
+  local no_ignore_parent = opts.no_ignore_parent
 
-local function getExtFindCommand()
-  return "rg --files --color never -g '!node_modules' -g '!.git'"
-end
-
-function M.previewer_maker(filepath, bufnr, opts)
-  opts = opts or {}
-
-  filepath = vim.fn.expand(filepath)
-  vim.loop.fs_stat(filepath, function (_, stat)
-    if not stat then return end
-    if stat.size > 100000 then
-      return
-    else
-      require('telescope.previewers').buffer_previewer_maker(filepath, bufnr, opts)
+  if command == 'fd' or command == 'fdfind' or command == 'rg' then
+    if hidden then
+      find_command[#find_command + 1] = '--hidden'
     end
-  end)
-end
 
-function M.buffers()
-  require('telescope.builtin').buffers({
-    ignore_current_buffer = true,
-    attach_mappings = function (prompt_bufnr, map)
-      map({'n', 'i'}, '<C-b>', function ()
-        actions.delete_buffer(prompt_bufnr)
-      end)
-
-      return true
+    if no_ignore then
+      find_command[#find_command + 1] = '--no-ignore'
     end
-  })
+
+    if no_ignore_parent then
+      find_command[#find_command + 1] = '--no-ignore-parent'
+    end
+  else
+    vim.notify('telescope: You need to install either find, fd/fdfind or ripgrep', vim.log.levels.ERROR)
+  end
+
+  return find_command
 end
 
-function M.ext_picker(opts, fn)
-  local find_command = getExtFindCommand()
+local function get_ext_find_command(opts)
+  local find_command = "rg --files --color never -g '!node_modules' -g '!.git'"
   local search_dirs = opts.search_dirs
 
   if opts.hidden then
@@ -203,138 +195,20 @@ function M.ext_picker(opts, fn)
     find_command = find_command .. ' ' .. option
   end
 
-  vim.fn.jobstart(find_command, {
-    stdout_buffered = true,
-    on_stdout = function (_, data)
-      if data then
-        pickers.new(opts, vim.tbl_extend('force', require('telescope.themes').get_dropdown { previewer = false, winblend = 10 }, {
-          prompt_title = 'Select a Filetype',
-          finder = finders.new_table({ results = data, entry_maker = make_entry.gen_from_file(opts) }),
-          sorter = conf.file_sorter(opts),
-          attach_mappings = function (prompt_bufnr)
-            actions.close:replace(function ()
-              close(prompt_bufnr)
-
-              fn(opts)
-            end)
-
-            action_set.select:replace(function ()
-              local current_picker = action_state.get_current_picker(prompt_bufnr)
-              local additional_args = {}
-              local selections = current_picker:get_multi_selection()
-
-              if vim.tbl_isempty(selections) then
-                if action_state.get_selected_entry().value == 'scss' then
-                  additional_args[#additional_args + 1] = '--type=sass'
-                elseif action_state.get_selected_entry().value == 'yml' then
-                  additional_args[#additional_args + 1] = '--type=yaml'
-                elseif action_state.get_selected_entry().value ~= '' then
-                  additional_args[#additional_args + 1] = '--type=' .. action_state.get_selected_entry().value
-                end
-              else
-                for _, selection in ipairs(selections) do
-                  if selection.value == 'scss' then
-                    additional_args[#additional_args + 1] = '--type=css'
-                  elseif selection.value == 'yml' then
-                    additional_args[#additional_args + 1] = '--type=yaml'
-                  else
-                    additional_args[#additional_args + 1] = '--type=' .. selection.value
-                  end
-                end
-              end
-
-              close(prompt_bufnr)
-
-              if type(opts.additional_args) == 'function' then
-                opts.additional_args = opts.additional_args(additional_args)
-              else
-                opts.additional_args = function (args)
-                  return vim.list_extend(args, additional_args)
-                end
-              end
-
-              fn(opts)
-            end)
-            return true
-          end
-        })):find()
-      else
-        vim.notify('No files found', vim.log.levels.ERROR)
-      end
-    end
-  })
+  return find_command
 end
 
-function M.dir_picker(opts, fn, live_grep)
-  local find_command = getDirFindCommand()
-  local command = find_command[1]
-  local hidden = opts.hidden
-  local no_ignore = opts.no_ignore
-  local no_ignore_parent = opts.no_ignore_parent
-
-  if command == 'fd' or command == 'fdfind' or command == 'rg' then
-    if hidden then
-      find_command[#find_command + 1] = '--hidden'
-    end
-
-    if no_ignore then
-      find_command[#find_command + 1] = '--no-ignore'
-    end
-
-    if no_ignore_parent then
-      find_command[#find_command + 1] = '--no-ignore-parent'
-    end
-  else
-    vim.notify('telescope: You need to install either find, fd/fdfind or ripgrep', vim.log.levels.ERROR)
-  end
-
-  vim.fn.jobstart(find_command, {
+local function start_dir_picker(command, opts, attach_mappings)
+  vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function (_, data)
       if data then
         pickers.new(opts, {
           prompt_title = 'Select a Directory',
           finder = finders.new_table({ results = data, entry_maker = make_entry.gen_from_file(opts) }),
-          previewer = getPreviewer(opts),
+          previewer = get_previewer(opts),
           sorter = conf.file_sorter(opts),
-          attach_mappings = function (prompt_bufnr)
-            actions.close:replace(function ()
-              close(prompt_bufnr)
-
-              if live_grep then
-                M.ext_picker(opts, fn)
-              else
-                fn(opts)
-              end
-            end)
-
-            action_set.select:replace(function ()
-              local current_picker = action_state.get_current_picker(prompt_bufnr)
-              local dirs = {}
-              local selections = current_picker:get_multi_selection()
-
-              if vim.tbl_isempty(selections) then
-                if action_state.get_selected_entry().value ~= '' then
-                  table.insert(dirs, action_state.get_selected_entry().value)
-                end
-              else
-                for _, selection in ipairs(selections) do
-                  table.insert(dirs, selection.value)
-                end
-              end
-
-              close(prompt_bufnr)
-
-              opts.search_dirs = dirs
-
-              if live_grep then
-                M.ext_picker(opts, fn)
-              else
-                fn(opts)
-              end
-            end)
-            return true
-          end
+          attach_mappings = attach_mappings,
         }):find()
       else
         vim.notify('No directories found', vim.log.levels.ERROR)
@@ -343,4 +217,174 @@ function M.dir_picker(opts, fn, live_grep)
   })
 end
 
+local function start_ext_picker(command, opts, attach_mappings)
+  vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_stdout = function (_, data)
+      if data then
+        pickers.new(opts, vim.tbl_extend('force', require('telescope.themes').get_dropdown { previewer = false, winblend = 10 }, {
+          prompt_title = 'Select a Filetype',
+          finder = finders.new_table({ results = data, entry_maker = make_entry.gen_from_file(opts) }),
+          sorter = conf.file_sorter(opts),
+          attach_mappings = attach_mappings,
+        })):find()
+      else
+        vim.notify('No files found', vim.log.levels.ERROR)
+      end
+    end
+  })
+end
+
+function M.previewer_maker(filepath, bufnr, opts)
+  opts = opts or {}
+
+  filepath = vim.fn.expand(filepath)
+  vim.loop.fs_stat(filepath, function (_, stat)
+    if not stat then return end
+    if stat.size > 100000 then
+      return
+    else
+      require('telescope.previewers').buffer_previewer_maker(filepath, bufnr, opts)
+    end
+  end)
+end
+
+function M.buffers()
+  require('telescope.builtin').buffers({
+    ignore_current_buffer = true,
+    attach_mappings = function (prompt_bufnr, map)
+      map({'n', 'i'}, '<C-b>', function ()
+        actions.delete_buffer(prompt_bufnr)
+      end)
+
+      return true
+    end
+  })
+end
+
+function M.ext_picker(opts, fn)
+  local find_command = get_ext_find_command(opts)
+
+  start_ext_picker(find_command, opts, function (prompt_bufnr)
+    actions.close:replace(function ()
+      close(prompt_bufnr)
+
+      fn(opts)
+    end)
+
+    action_set.select:replace(function ()
+      local current_picker = action_state.get_current_picker(prompt_bufnr)
+      local additional_args = {}
+      local selections = current_picker:get_multi_selection()
+
+      if vim.tbl_isempty(selections) then
+        if action_state.get_selected_entry().value == 'scss' then
+          additional_args[#additional_args + 1] = '--type=sass'
+        elseif action_state.get_selected_entry().value == 'yml' then
+          additional_args[#additional_args + 1] = '--type=yaml'
+        elseif action_state.get_selected_entry().value ~= '' then
+          additional_args[#additional_args + 1] = '--type=' .. action_state.get_selected_entry().value
+        end
+      else
+        for _, selection in ipairs(selections) do
+          if selection.value == 'scss' then
+            additional_args[#additional_args + 1] = '--type=css'
+          elseif selection.value == 'yml' then
+            additional_args[#additional_args + 1] = '--type=yaml'
+          else
+            additional_args[#additional_args + 1] = '--type=' .. selection.value
+          end
+        end
+      end
+
+      close(prompt_bufnr)
+
+      if type(opts.additional_args) == 'function' then
+        opts.additional_args = opts.additional_args(additional_args)
+      else
+        opts.additional_args = function (args)
+          return vim.list_extend(args, additional_args)
+        end
+      end
+
+      fn(opts)
+    end)
+    return true
+  end)
+end
+
+function M.dir_picker(opts, fn, live_grep)
+  local find_command = get_dir_find_command(opts)
+
+  start_dir_picker(find_command, opts, function (prompt_bufnr)
+    actions.close:replace(function ()
+      close(prompt_bufnr)
+
+      if live_grep then
+        M.ext_picker(opts, fn)
+      else
+        fn(opts)
+      end
+    end)
+
+    action_set.select:replace(function ()
+      local current_picker = action_state.get_current_picker(prompt_bufnr)
+      local dirs = {}
+      local selections = current_picker:get_multi_selection()
+
+      if vim.tbl_isempty(selections) then
+        if action_state.get_selected_entry().value ~= '' then
+          table.insert(dirs, action_state.get_selected_entry().value)
+        end
+      else
+        for _, selection in ipairs(selections) do
+          table.insert(dirs, selection.value)
+        end
+      end
+
+      close(prompt_bufnr)
+
+      opts.search_dirs = dirs
+
+      if live_grep then
+        M.ext_picker(opts, fn)
+      else
+        fn(opts)
+      end
+    end)
+    return true
+  end)
+end
+
+function M.oil_picker(opts)
+  local find_command = get_dir_find_command(opts)
+
+  start_dir_picker(find_command, opts, function (prompt_bufnr)
+    actions.close:replace(function ()
+      close(prompt_bufnr)
+
+      vim.schedule(function ()
+        vim.cmd('Oil')
+      end)
+    end)
+
+    action_set.select:replace(function ()
+      local current_picker = action_state.get_current_picker(prompt_bufnr)
+      local selections = current_picker:get_multi_selection()
+
+      if vim.tbl_isempty(selections) then
+        if action_state.get_selected_entry().value ~= '' then
+          vim.schedule(function ()
+            vim.cmd('Oil ' .. action_state.get_selected_entry().value)
+          end)
+        end
+      end
+
+      close(prompt_bufnr)
+    end)
+    return true
+  end)
+end
+
 return M
+
