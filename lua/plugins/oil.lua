@@ -23,6 +23,15 @@ return {
       },
     }, { prefix = '<leader>' })
 
+    opts.keymaps = {
+      ['<C-b>'] = 'actions.preview_scroll_up',
+      ['<C-f>'] = 'actions.preview_scroll_down',
+      ['<C-h>'] = false,
+      ['<C-l>'] = false,
+      ['<C-s>'] = 'actions.select_split',
+      ['<C-v>'] = 'actions.select_vsplit',
+    }
+
     return opts
   end
 }
