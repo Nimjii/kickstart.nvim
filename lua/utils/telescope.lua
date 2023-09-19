@@ -144,6 +144,20 @@ local function getExtFindCommand()
   return "rg --files --color never -g '!node_modules' -g '!.git'"
 end
 
+function M.previewer_maker(filepath, bufnr, opts)
+  opts = opts or {}
+
+  filepath = vim.fn.expand(filepath)
+  vim.loop.fs_stat(filepath, function (_, stat)
+    if not stat then return end
+    if stat.size > 100000 then
+      return
+    else
+      require('telescope.previewers').buffer_previewer_maker(filepath, bufnr, opts)
+    end
+  end)
+end
+
 function M.buffers()
   require('telescope.builtin').buffers({
     ignore_current_buffer = true,

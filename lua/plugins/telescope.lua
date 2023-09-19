@@ -121,9 +121,37 @@ return {
     end
 
     opts.defaults = {
+      buffer_previewer_maker = require('utils.telescope').previewer_maker,
+      path_display = { 'truncate' },
+      preview = {
+        mime_hook = function (filepath, bufnr, opts)
+          local is_image = function (path)
+            local image_extensions = {'gif', 'png', 'jpg', 'jpeg'}
+            local split_path = vim.split(path:lower(), '.', { plain = true })
+            local extension = split_path[#split_path]
+
+            return vim.tbl_contains(image_extensions, extension)
+          end
+
+          if is_image(filepath) then
+            local term = vim.api.nvim_open_term(bufnr, {})
+            local function send_output(_, data, _)
+              for _, d in ipairs(data) do
+                vim.api.nvim_chan_send(term, d .. '\r\n')
+              end
+            end
+
+            vim.fn.jobstart(
+              { 'catimg', filepath },
+              { on_stdout = send_output, stdout_buffered = true, pty = true }
+            )
+          else
+            require('telescope.previewers.utils').set_preview_message(bufnr, opts.winid, 'Binary cannot be previewed')
+          end
+        end
+      },
       prompt_prefix = string.format('%s ', ' '),
       selection_caret = string.format('%s ', '❯'),
-      path_display = { 'truncate' },
       file_ignore_patterns = {
         "node_modules/",
         ".git/",
