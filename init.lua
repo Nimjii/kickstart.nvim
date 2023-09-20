@@ -229,7 +229,6 @@ end
 local servers = {
   cssls = {},
   html = {},
-  phpactor = {},
   tsserver = {},
 
   tailwindcss = {
