@@ -81,17 +81,6 @@ require('lazy').setup({
   },
 
   {
-    'Wansmer/symbol-usage.nvim',
-    event = 'BufReadPre',
-    opts = {
-      filetypes = {
-        'javascript',
-        'php',
-      },
-    },
-  },
-
-  {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
