@@ -23,6 +23,13 @@ return {
       },
     }, { prefix = '<leader>' })
 
+    opts.view_options = {
+      show_hidden = true,
+      is_always_hidden = function (name)
+        return name == '.DS_Store'
+      end
+    }
+
     opts.keymaps = {
       ['<C-b>'] = 'actions.preview_scroll_up',
       ['<C-f>'] = 'actions.preview_scroll_down',
@@ -30,6 +37,17 @@ return {
       ['<C-l>'] = false,
       ['<C-s>'] = 'actions.select_split',
       ['<C-v>'] = 'actions.select_vsplit',
+      ['<C-o>'] = {
+        callback = function ()
+          local oil = require('oil')
+          local name = oil.get_cursor_entry()['parsed_name']
+          local path = oil.get_current_dir() .. name
+
+          require('utils').system_open(path)
+        end,
+        desc = 'Open in finder',
+        nowait = true,
+      },
     }
 
     return opts
