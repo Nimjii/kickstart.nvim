@@ -216,6 +216,7 @@ local on_attach = function(_, bufnr)
   nmap('<leader>lr', vim.lsp.buf.rename, 'Rename symbol')
   nmap('<leader>la', vim.lsp.buf.code_action, 'Code action')
   nmap('<leader>lf', vim.lsp.buf.format, 'Format buffer')
+  nmap('<leader>lS', function() require("aerial").toggle() end, 'Symbols outline')
 
   nmap('gd', vim.lsp.buf.definition, 'Goto Definition')
   nmap('gD', vim.lsp.buf.declaration, 'Goto Declaration')
