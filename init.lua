@@ -179,8 +179,17 @@ vim.keymap.set('n', ']t', function () vim.cmd.tabnext() end, { desc = 'Next tab'
 vim.keymap.set('n', '[t', function () vim.cmd.tabprevious() end, { desc = 'Previous tab' })
 
 -- Quickfix mappings
-vim.keymap.set('n', '<leader>b', '<cmd>copen<cr>', { desc = 'Open quickfix' })
-vim.keymap.set('n', '<leader>B', '<cmd>cclose<cr>', { desc = 'Close quickfix' })
+require('which-key').register({
+  b = { '<cmd>copen<cr>', 'Open quickfix' },
+  B = { '<cmd>cclose<cr>', 'Close quickfix' },
+  F = {
+    name = ' Quickfix',
+    n = { '<cmd>cnext<cr>', 'Next quickfix entry' },
+    p = { '<cmd>cprevious<cr>', 'Previous quickfix entry' },
+    N = { '<cmd>cnfile<cr>', 'Next file in quickfix list' },
+    P = { '<cmd>cpfile<cr>', 'Previous file in quickfix list' },
+  },
+}, { prefix = '<leader>' })
 
 -- Buffer mappings
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })
