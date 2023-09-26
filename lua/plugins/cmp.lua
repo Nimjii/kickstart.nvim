@@ -78,7 +78,7 @@ return {
          fallback()
        end
       end,
-      s = cmp.mapping.confirm({ select = true }),
+      s = cmp.mapping.confirm({ select = false }),
       c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
     }
 
