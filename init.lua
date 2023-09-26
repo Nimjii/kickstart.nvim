@@ -178,6 +178,10 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('n', ']t', function () vim.cmd.tabnext() end, { desc = 'Next tab' })
 vim.keymap.set('n', '[t', function () vim.cmd.tabprevious() end, { desc = 'Previous tab' })
 
+-- Quickfix mappings
+vim.keymap.set('n', '<leader>b', '<cmd>copen<cr>', { desc = 'Open quickfix' })
+vim.keymap.set('n', '<leader>B', '<cmd>cclose<cr>', { desc = 'Close quickfix' })
+
 -- Buffer mappings
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = 'Save' })
 vim.keymap.set('n', '<leader>q', '<cmd>confirm q<cr>', { desc = 'Quit' })
