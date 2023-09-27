@@ -91,6 +91,13 @@ require('lazy').setup({
     },
   },
 
+  {
+    'declancm/maximize.nvim',
+    config = function ()
+      require('maximize').setup()
+    end,
+  },
+
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 }, {})

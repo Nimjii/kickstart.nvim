@@ -22,11 +22,16 @@ local function get_grapple()
   return "󰛢 [" .. key .. "]"
 end
 
+local function maximize_status()
+  return vim.t.maximized and '󰁌' or ''
+end
+
 return {
   -- Set lualine as statusline
   'nvim-lualine/lualine.nvim',
   -- See `:help lualine.txt`
   dependencies = {
+    'declancm/maximize.nvim',
     'f-person/git-blame.nvim',
   },
   opts = function (_, opts)
@@ -63,7 +68,7 @@ return {
       lualine_a = {'branch'},
       lualine_b = { get_lsps },
       lualine_c = {},
-      lualine_x = {},
+      lualine_x = { maximize_status },
       lualine_y = {
         { get_grapple, cond = require('grapple').exists },
       },
