@@ -231,10 +231,15 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('<leader>lr', vim.lsp.buf.rename, 'Rename symbol')
-  nmap('<leader>la', vim.lsp.buf.code_action, 'Code action')
-  nmap('<leader>lf', vim.lsp.buf.format, 'Format buffer')
-  nmap('<leader>lS', function() require("aerial").toggle() end, 'Symbols outline')
+  require('which-key').register({
+    l = {
+      name = '󰚔 LSP',
+      r = { vim.lsp.buf.rename, 'Rename symbol' },
+      a = { vim.lsp.buf.code_action, 'Code action' },
+      f = { vim.lsp.buf.format, 'Format buffer' },
+      S = { function() require('aerial').toggle() end, 'Symbols outline' },
+    },
+  }, { buffer = bufnr, prefix = '<leader>'})
 
   nmap('gd', vim.lsp.buf.definition, 'Goto Definition')
   nmap('gD', vim.lsp.buf.declaration, 'Goto Declaration')
