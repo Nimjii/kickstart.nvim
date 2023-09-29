@@ -13,6 +13,7 @@ return {
           'fugitive',
           'neo-tree filesystem',
       },
+      large_file_cutoff = 10000,
     })
 
     vim.keymap.del('n', '<a-p>')

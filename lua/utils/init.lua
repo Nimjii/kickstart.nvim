@@ -38,4 +38,17 @@ function M.system_open(path)
   vim.fn.jobstart(vim.fn.extend(cmd, { path or vim.fn.expand "<cfile>" }), { detach = true })
 end
 
+function M.is_large_file(bufnr)
+  local max_filesize = 100 * 2048
+  local fd_ok, fd = pcall(vim.loop.fs_open, vim.api.nvim_buf_get_name(bufnr), 'r', 438)
+  local stats_ok, stats = pcall(vim.loop.fs_fstat, fd)
+
+  pcall(vim.loop.fs_close, fd)
+
+  if fd_ok and stats_ok and stats and stats.size > max_filesize then
+    return true
+  end
+  return false
+end
+
 return M

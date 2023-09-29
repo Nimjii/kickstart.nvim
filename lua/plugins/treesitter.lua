@@ -21,6 +21,11 @@ return {
       },
       highlight = {
         enable = true,
+        disable = function (_, buf)
+          if require('utils').is_large_file(buf) then
+            return true
+          end
+        end,
       },
       indent = {
         enable = true,
