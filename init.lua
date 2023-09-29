@@ -106,19 +106,19 @@ require('lazy').setup({
 pcall(require('telescope').load_extension, 'fzf')
 
 -- Set up neotree bindings
--- require('which-key').register({
---   e = { '<cmd>Neotree toggle<cr>', 'Toggle NeoTree' },
---   o = {
---     function ()
---       if vim.bo.filetype == "neo-tree" then
---         vim.cmd.wincmd "p"
---       else
---         vim.cmd.Neotree "focus"
---       end
---     end,
---     'Toggle Explorer Focus',
---   },
--- }, { prefix = '<leader>' })
+require('which-key').register({
+  e = { '<cmd>Neotree toggle<cr>', 'Toggle NeoTree' },
+  o = {
+    function ()
+      if vim.bo.filetype == "neo-tree" then
+        vim.cmd.wincmd "p"
+      else
+        vim.cmd.Neotree "focus"
+      end
+    end,
+    'Toggle Explorer Focus',
+  },
+}, { prefix = '<leader>' })
 
 --[[ Setting options ]]
 
