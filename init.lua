@@ -65,14 +65,6 @@ require('lazy').setup({
   },
 
   {
-    "chrisgrieser/nvim-various-textobjs",
-    event = "VeryLazy",
-    opts = {
-      useDefaultKeymaps = true,
-    },
-  },
-
-  {
     "kylechui/nvim-surround",
     event = "VeryLazy",
     config = function()
@@ -252,7 +244,6 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('S', vim.lsp.buf.signature_help, 'Signature Documentation')
 end
 
 local servers = {
