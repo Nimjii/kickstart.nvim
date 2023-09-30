@@ -11,7 +11,7 @@ return {
           'dirbuf',
           'dirvish',
           'fugitive',
-          'neo-tree filesystem',
+          'neo-tree',
       },
       large_file_cutoff = 10000,
     })
