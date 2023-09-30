@@ -92,6 +92,13 @@ require('lazy').setup({
     },
   },
 
+  {
+    'Wansmer/symbol-usage.nvim',
+    config = function ()
+      require('symbol-usage').setup({})
+    end,
+  },
+
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 }, {})
