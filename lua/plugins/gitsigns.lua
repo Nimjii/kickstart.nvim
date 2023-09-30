@@ -4,7 +4,7 @@ return {
   -- Adds git related signs to the gutter, as well as utilities for managing changes
   'lewis6991/gitsigns.nvim',
   dependencies = {
-    'folke/which-key.nvim'
+    'folke/which-key.nvim',
   },
   opts = {
     signs = {
@@ -30,10 +30,8 @@ return {
         if vim.wo.diff then return ']h' end
         vim.schedule(function ()
           require('gitsigns').next_hunk()
-
-          vim.schedule(function ()
-            vim.cmd.norm { args = { 'zz' }, bang = true }
-          end)
+          vim.wait(25)
+          vim.cmd('norm zz')
         end)
         return '<Ignore>'
       end, { buffer = bufnr, desc = 'Go to next hunk' })
@@ -42,10 +40,8 @@ return {
         if vim.wo.diff then return '[h' end
         vim.schedule(function ()
           require('gitsigns').prev_hunk()
-
-          vim.schedule(function ()
-            vim.cmd.norm { args = { 'zz' }, bang = true }
-          end)
+          vim.wait(25)
+          vim.cmd('norm zz')
         end)
         return '<Ignore>'
       end, { buffer = bufnr, desc = 'Go to previous hunk' })
