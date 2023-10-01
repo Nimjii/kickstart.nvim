@@ -139,6 +139,7 @@ vim.o.mouse= 'a'
 vim.o.pumblend = 5
 vim.o.scrolloff= 8
 vim.o.smartcase= true
+vim.o.tabstop = 4
 vim.o.termguicolors= true
 vim.o.timeoutlen= 300
 vim.o.undofile= true
